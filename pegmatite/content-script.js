@@ -128,6 +128,20 @@ var siteProfiles = {
 		}
 	}
 };
+var siteProfilesAdoc = {
+	"default": {
+		"selector": "pre",
+		"extract": function (elem) {
+			return elem.innerText.trim();
+		},
+		"replace": function (elem) {
+			return elem;
+		},
+		"compress": function (elem) {
+			return compress(elem.innerText.trim());
+		}
+	},
+}
 
 
 function loop(counter, retry, siteProfile, baseUrl){
@@ -160,6 +174,11 @@ function onLoadAction(siteProfile, baseUrl){
 function run(config) {
 	var hostname = window.location.hostname.split(".").slice(-2).join(".");
 	var siteProfile = siteProfiles[hostname] || siteProfiles["default"];
+
+	if(window.location.pathname.endsWith('.adoc')) {
+		siteProfile = siteProfilesAdoc["default"]
+	}
+
 	var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/img/";
 	if (document.querySelector("i[aria-label='Loading content…']")!=null){ // for wait loading @ gitlab.com
 		loop(1, 10, siteProfile, baseUrl);
