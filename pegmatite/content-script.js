@@ -128,6 +128,7 @@ var siteProfiles = {
 		}
 	}
 };
+
 var siteProfilesAdoc = {
 	"default": {
 		"selector": "pre",
@@ -157,9 +158,11 @@ function loop(counter, retry, siteProfile, baseUrl){
 function onLoadAction(siteProfile, baseUrl){
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
-		if (plantuml.substr(0, "@start".length) !== "@start") return;
+		//if (plantuml.substr(0, "@start".length) !== "@start") return;
 		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
 		var replaceElem = siteProfile.replace(umlElem);
+
+		/*
 		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
 			replaceElement(replaceElem, plantUmlServerUrl);
 		} else {
@@ -168,6 +171,11 @@ function onLoadAction(siteProfile, baseUrl){
 				replaceElement(replaceElem, dataUri);
 			});
 		}
+		*/
+		chrome.runtime.sendMessage({ "action": "plantuml", "url": plantUmlServerUrl }, function(dataUri) {
+			replaceElement(replaceElem, dataUri);
+		});
+
 	});
 }
 
@@ -185,9 +193,11 @@ function run(config) {
 	}
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
-		if (plantuml.substr(0, "@start".length) !== "@start") return;
+		// if (plantuml.substr(0, "@start".length) !== "@start") return;
 		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
 		var replaceElem = siteProfile.replace(umlElem);
+
+		/*
 		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
 			replaceElement(replaceElem, plantUmlServerUrl);
 		} else {
@@ -196,6 +206,10 @@ function run(config) {
 				replaceElement(replaceElem, dataUri);
 			});
 		}
+		*/
+		chrome.runtime.sendMessage({ "action": "plantuml", "url": plantUmlServerUrl }, function(dataUri) {
+			replaceElement(replaceElem, dataUri);
+		});
 	});
 }
 

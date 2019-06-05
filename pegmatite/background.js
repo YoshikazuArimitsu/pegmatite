@@ -3,11 +3,14 @@
 
 function fechImageDataUri(uri, callback) {
 	fetchImage(uri, function() {
-		var contentType = this.getResponseHeader("Content-Type");
-		var unicode = toUnicodeString(this.response);
-		var base64 = encodeBase64(unicode);
-		var dataUri = "data:" + contentType + ";base64," + base64;
-		callback(dataUri);
+		if(this.status === 200) {
+			console.log(this);
+			var contentType = this.getResponseHeader("Content-Type");
+			var unicode = toUnicodeString(this.response);
+			var base64 = encodeBase64(unicode);
+			var dataUri = "data:" + contentType + ";base64," + base64;
+			callback(dataUri);
+		}
 	});
 }
 
