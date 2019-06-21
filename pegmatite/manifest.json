@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Pegmatite",
-  "version": "1.5.1",
-  "description": "Shows graphs and diagrams rendered by PlantUML.",
+  "version": "1.5.1.1",
+  "description": "Shows graphs and diagrams rendered by PlantUML. AsciiDoc support.",
   "permissions": ["storage", "<all_urls>"],
   "options_page": "options.html",
   "options_ui": {

@@ -129,6 +129,21 @@ var siteProfiles = {
 	}
 };
 
+var siteProfilesAdoc = {
+	"default": {
+		"selector": "pre",
+		"extract": function (elem) {
+			return elem.innerText.trim();
+		},
+		"replace": function (elem) {
+			return elem;
+		},
+		"compress": function (elem) {
+			return compress(elem.innerText.trim());
+		}
+	},
+}
+
 
 function loop(counter, retry, siteProfile, baseUrl){
 	counter++;
@@ -143,9 +158,11 @@ function loop(counter, retry, siteProfile, baseUrl){
 function onLoadAction(siteProfile, baseUrl){
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
-		if (plantuml.substr(0, "@start".length) !== "@start") return;
+		//if (plantuml.substr(0, "@start".length) !== "@start") return;
 		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
 		var replaceElem = siteProfile.replace(umlElem);
+
+		/*
 		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
 			replaceElement(replaceElem, plantUmlServerUrl);
 		} else {
@@ -154,21 +171,33 @@ function onLoadAction(siteProfile, baseUrl){
 				replaceElement(replaceElem, dataUri);
 			});
 		}
+		*/
+		chrome.runtime.sendMessage({ "action": "plantuml", "url": plantUmlServerUrl }, function(dataUri) {
+			replaceElement(replaceElem, dataUri);
+		});
+
 	});
 }
 
 function run(config) {
 	var hostname = window.location.hostname.split(".").slice(-2).join(".");
 	var siteProfile = siteProfiles[hostname] || siteProfiles["default"];
+
+	if(window.location.pathname.endsWith('.adoc')) {
+		siteProfile = siteProfilesAdoc["default"]
+	}
+
 	var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/img/";
 	if (document.querySelector("i[aria-label='Loading content…']")!=null){ // for wait loading @ gitlab.com
 		loop(1, 10, siteProfile, baseUrl);
 	}
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
-		if (plantuml.substr(0, "@start".length) !== "@start") return;
+		// if (plantuml.substr(0, "@start".length) !== "@start") return;
 		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
 		var replaceElem = siteProfile.replace(umlElem);
+
+		/*
 		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
 			replaceElement(replaceElem, plantUmlServerUrl);
 		} else {
@@ -177,6 +206,10 @@ function run(config) {
 				replaceElement(replaceElem, dataUri);
 			});
 		}
+		*/
+		chrome.runtime.sendMessage({ "action": "plantuml", "url": plantUmlServerUrl }, function(dataUri) {
+			replaceElement(replaceElem, dataUri);
+		});
 	});
 }
 
